@@ -1,0 +1,5 @@
+com\example\orderservice\Order.class
+com\example\orderservice\ProductClient.class
+com\example\orderservice\Product.class
+com\example\orderservice\OrderServiceApplication.class
+com\example\orderservice\OrderController.class
