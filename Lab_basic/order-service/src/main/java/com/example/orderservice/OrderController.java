@@ -12,26 +12,27 @@ import java.util.Map;
 public class OrderController {
 
     private final ProductClient productClient;
+    private final UserClient userClient;
     private final Map<Long, Order> orderMap = new HashMap<>();
     private Long nextOrderId = 1L;
 
-    public OrderController(ProductClient productClient) {
+    public OrderController(ProductClient productClient, UserClient userClient) {
         this.productClient = productClient;
+        this.userClient = userClient;
     }
 
     @PostMapping
-    public Order createOrder(@RequestBody Order order) {
-        // Get product details from product-service
-        Product product = productClient.getProduct(order.getProductId());
+    public Order createOrder(@RequestParam Long productId, @RequestParam Long userId, @RequestParam int quantity) {
+        Product product = productClient.getProduct(productId);
+        User user = userClient.getUser(userId);
 
-        // Set order details
-        order.setId(nextOrderId++);
-        order.setProduct(product);
-        order.setTotalPrice(product.getPrice() * order.getQuantity());
-
-        // Save order
-        orderMap.put(order.getId(), order);
-        return order;
+        if (product != null && user != null) {
+            double totalPrice = product.getPrice() * quantity;
+            Order order = new Order(nextOrderId++, productId, userId, quantity, totalPrice, product, user);
+            orderMap.put(order.getId(), order);
+            return order;
+        }
+        return null;
     }
 
     @GetMapping("/{id}")
@@ -44,15 +45,19 @@ public class OrderController {
         return new ArrayList<>(orderMap.values());
     }
 
-    @GetMapping("/product-stats")
-    public Map<String, Object> getProductStats() {
-        Map<String, Object> response = new HashMap<>();
+    @GetMapping("/stats")
+    public Map<String, Object> getOrderStats() {
+        Map<String, Object> stats = new HashMap<>();
         Map<String, Object> productStats = productClient.getProductStats();
-        response.put("productStats", productStats);
-        response.put("totalOrders", orderMap.size());
-        response.put("totalOrderValue", orderMap.values().stream()
+        Map<String, Object> userStats = userClient.getUserStats();
+
+        stats.put("productStats", productStats);
+        stats.put("userStats", userStats);
+        stats.put("totalOrders", orderMap.size());
+        stats.put("totalOrderValue", orderMap.values().stream()
                 .mapToDouble(Order::getTotalPrice)
                 .sum());
-        return response;
+
+        return stats;
     }
 }

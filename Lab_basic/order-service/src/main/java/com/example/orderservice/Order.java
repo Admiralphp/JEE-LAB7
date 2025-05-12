@@ -3,20 +3,24 @@ package com.example.orderservice;
 public class Order {
     private Long id;
     private Long productId;
+    private Long userId;
     private int quantity;
     private double totalPrice;
     private Product product;
+    private User user;
 
     // Default constructor for JSON deserialization
     public Order() {
     }
 
-    public Order(Long id, Long productId, int quantity, double totalPrice, Product product) {
+    public Order(Long id, Long productId, Long userId, int quantity, double totalPrice, Product product, User user) {
         this.id = id;
         this.productId = productId;
+        this.userId = userId;
         this.quantity = quantity;
         this.totalPrice = totalPrice;
         this.product = product;
+        this.user = user;
     }
 
     // Getters and setters
@@ -34,6 +38,14 @@ public class Order {
 
     public void setProductId(Long productId) {
         this.productId = productId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public int getQuantity() {
@@ -58,5 +70,13 @@ public class Order {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
